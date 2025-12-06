@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cosa Ne Sai? - Quiz sulla Mafia</title>
+    <style>
+        /* Smooth Scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+        /* Design System Variables - The Godfather Aesthetic */
+        :root {
+            --color-primary-dark: #0a0e27;
+            --color-secondary-dark: #1a1f3a;
+            --color-accent-gold: #d4af37;
+            --color-accent-cream: #f5f1e8;
+            --color-text-primary: #ffffff;
+            --color-text-secondary: #e0e0e0;
+            --color-border-subtle: rgba(212, 175, 55, 0.2);
+            --color-shadow: rgba(0, 0, 0, 0.5);
+            --font-family-serif: 'Playfair Display', 'Georgia', serif;
+            --font-family-sans: 'Lato', -apple-system, BlinkMacSystemFont, sans-serif;
+            --transition-smooth: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            --shadow-elevated: 0 10px 40px rgba(0, 0, 0, 0.6);
+            --shadow-subtle: 0 4px 12px rgba(0, 0, 0, 0.4);
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: var(--font-family-sans);
+            background: linear-gradient(135deg, var(--color-primary-dark) 0%, #000000 50%, var(--color-secondary-dark) 100%);
+            color: var(--color-text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            position: relative;
+        }
+        /* Subtle texture overlay */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.02'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            opacity: 0.3;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 24px;
+            width: 100%;
+            position: relative;
+            z-index: 1;
+        }
+        /* Header Section */
+        header {
+            text-align: center;
+            padding: 80px 24px 60px;
+            position: relative;
+        }
+        .header-ornament {
+            width: 80px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--color-accent-gold), transparent);
+            margin: 0 auto 32px;
+            position: relative;
+        }
+        .header-ornament::before,
+        .header-ornament::after {
+            content: '';
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: var(--color-accent-gold);
+            border-radius: 50%;
+            top: -3px;
+        }
+        .header-ornament::before {
+            left: 0;
+        }
+        .header-ornament::after {
+            right: 0;
+        }
+        h1 {
+            font-family: var(--font-family-serif);
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            margin-bottom: 24px;
+            color: var(--color-accent-gold);
+            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.8);
+            line-height: 1.2;
+        }
+        .subtitle {
+            font-family: var(--font-family-sans);
+            font-size: clamp(1rem, 2.5vw, 1.25rem);
+            color: var(--color-text-secondary);
+            font-weight: 300;
+            letter-spacing: 0.03em;
+            max-width: 700px;
+            margin: 0 auto 40px;
+            line-height: 1.6;
+        }
+        /* Quiz Form */
+        .quiz-container {
+            background: rgba(26, 31, 58, 0.6);
+            border: 1px solid var(--color-border-subtle);
+            border-radius: 8px;
+            padding: 40px 32px;
+            margin-bottom: 40px;
+            box-shadow: var(--shadow-subtle);
+            backdrop-filter: blur(10px);
+        }
+        .question {
+            margin-bottom: 32px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid var(--color-border-subtle);
+        }
+        .question:last-child {
+            border-bottom: none;
+            margin-bottom: 24px;
+            padding-bottom: 0;
+        }
+        .question-number {
+            display: block;
+            font-family: var(--font-family-serif);
+            color: var(--color-accent-gold);
+            font-size: 1rem;
+            margin-bottom: 8px;
+            letter-spacing: 0.05em;
+        }
+        .question-text {
+            font-size: 1.125rem;
+            margin-bottom: 16px;
+            line-height: 1.5;
+            font-weight: 400;
+        }
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            background: rgba(10, 14, 39, 0.4);
+            border: 1px solid transparent;
+            border-radius: 6px;
+            transition: var(--transition-smooth);
+            cursor: pointer;
+        }
+        .option:hover {
+            border-color: var(--color-accent-gold);
+            background: rgba(212, 175, 55, 0.08);
+        }
+        .option input {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--color-accent-gold);
+        }
+        .option label {
+            cursor: pointer;
+            font-size: 1rem;
+            line-height: 1.4;
+        }
+        /* True/False */
+        .true-false {
+            margin-bottom: 32px;
+        }
+        /* Buttons */
+        .actions {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        .btn {
+            display: inline-block;
+            padding: 16px 48px;
+            background: transparent;
+            color: var(--color-accent-gold);
+            text-decoration: none;
+            font-family: var(--font-family-sans);
+            font-size: 1rem;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            border: 2px solid var(--color-accent-gold);
+            border-radius: 4px;
+            transition: var(--transition-smooth);
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+            min-width: 180px;
+            text-align: center;
+            cursor: pointer;
+        }
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: var(--color-accent-gold);
+            transform: translate(-50%, -50%);
+            transition: width 0.5s ease, height 0.5s ease;
+            z-index: -1;
+        }
+        .btn:hover {
+            color: var(--color-primary-dark);
+            border-color: var(--color-accent-gold);
+            box-shadow: 0 0 25px rgba(212, 175, 55, 0.6);
+        }
+        .btn:hover::before {
+            width: 300%;
+            height: 300%;
+        }
+        .btn:focus {
+            outline: 2px solid var(--color-accent-gold);
+            outline-offset: 4px;
+        }
+        /* Result display */
+        .result-container {
+            display: none;
+            background: rgba(26, 31, 58, 0.6);
+            border: 1px solid var(--color-border-subtle);
+            border-radius: 8px;
+            padding: 40px 32px;
+            margin-top: 40px;
+            box-shadow: var(--shadow-subtle);
+            backdrop-filter: blur(10px);
+            text-align: center;
+        }
+        .result-title {
+            font-family: var(--font-family-serif);
+            font-size: 2rem;
+            color: var(--color-accent-gold);
+            margin-bottom: 24px;
+        }
+        .score {
+            font-size: 1.5rem;
+            margin-bottom: 24px;
+            line-height: 1.5;
+        }
+        .feedback {
+            font-size: 1.125rem;
+            margin-bottom: 32px;
+            line-height: 1.6;
+            color: var(--color-text-secondary);
+        }
+        .correct-answer {
+            display: block;
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px dashed var(--color-border-subtle);
+            font-style: italic;
+            font-size: 0.95rem;
+            color: var(--color-accent-cream);
+        }
+        /* Responsive */
+        @media (max-width: 768px) {
+            header {
+                padding: 60px 20px 40px;
+            }
+            .quiz-container,
+            .result-container {
+                padding: 32px 24px;
+            }
+            .btn {
+                width: 100%;
+                max-width: 300px;
+                padding: 14px 24px;
+            }
+            .actions {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-ornament"></div>
+            <h1>COSA NE SAI?</h1>
+            <p class="subtitle">Metti alla prova la tua conoscenza sulla lotta alla mafia e sulla giustizia italiana</p>
+        </div>
+    </header>
+
+    <main class="container">
+        <form id="mafiaQuiz">
+            <div class="quiz-container">
+                <!-- Domanda 9 -->
+                <div class="question">
+                    <span class="question-number">Domanda 1</span>
+                    <div class="question-text">Che cosa fu il Maxiprocesso di Palermo (1986-1987)?</div>
+                    <div class="options">
+                        <div class="option">
+                            <input type="radio" name="q9" id="q9a" value="A">
+                            <label for="q9a">A) Un'operazione militare contro la mafia</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" name="q9" id="q9b" value="B">
+                            <label for="q9b">B) Il più grande processo contro la mafia nella storia italiana</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" name="q9" id="q9c" value="C">
+                            <label for="q9c">C) Un accordo di pace tra le organizzazioni mafiose</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" name="q9" id="q9d" value="D">
+                            <label for="q9d">D) Una serie di omicidi legati alla mafia</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Domanda 10 -->
+                <div class="question">
+                    <span class="question-number">Domanda 2</span>
+                    <div class="question-text">In quale anno furono assassinati Giovanni Falcone e Paolo Borsellino?</div>
+                    <div class="options">
+                        <div class="option">
+                            <input type="radio" name="q10" id="q10a" value="A">
+                            <label for="q10a">A) 1990 e 1991</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" name="q10" id="q10b" value="B">
+                            <label for="q10b">B) 1992 e 1993</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" name="q10" id="q10c" value="C">
+                            <label for="q10c">C) 1992 (entrambi)</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" name="q10" id="q10d" value="D">
+                            <label for="q10d">D) 1989 e 1992</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Domanda 11 -->
+                <div class="question">
+                    <span class="question-number">Domanda 3</span>
+                    <div class="question-text">Chi era Salvatore Riina (Totò Riina)?</div>
+                    <div class="options">
+                        <div class="option">
+                            <input type="radio" name="q11" id="q11a" value="A">
+                            <label for="q11a">A) Un magistrato anti-mafia</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" name="q11" id="q11b" value="B">
+                            <label for="q11b">B) Un pentito della mafia</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" name="q11" id="q11c" value="C">
+                            <label for="q11c">C) Un potente boss di Cosa Nostra</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" name="q11" id="q11d" value="D">
+                            <label for="q11d">D) Un giornalista che investigava sulla mafia</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Domanda 12 -->
+                <div class="question">
+                    <span class="question-number">Domanda 4</span>
+                    <div class="question-text">Quale tra questi è un'organizzazione mafiosa italiana?</div>
+                    <div class="options">
+                        <div class="option">
+                            <input type="radio" name="q12" id="q12a" value="A">
+                            <label for="q12a">A) La Camorra</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" name="q12" id="q12b" value="B">
+                            <label for="q12b">B) La 'Ndrangheta</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" name="q12" id="q12c" value="C">
+                            <label for="q12c">C) Cosa Nostra</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" name="q12" id="q12d" value="D">
+                            <label for="q12d">D) Tutte le precedenti</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Domanda 13 -->
+                <div class="question">
+                    <span class="question-number">Domanda 5</span>
+                    <div class="question-text">Quante organizzazioni mafiose principali operano in Italia?</div>
+                    <div class="options">
+                        <div class="option">
+                            <input type="radio" name="q13" id="q13a" value="A">
+                            <label for="q13a">A) Solo una (Cosa Nostra)</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" name="q13" id="q13b" value="B">
+                            <label for="q13b">B) Due (Cosa Nostra e Camorra)</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" name="q13" id="q13c" value="C">
+                            <label for="q13c">C) Più di quattro organizzazioni diverse</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" name="q13" id="q13d" value="D">
+                            <label for="q13d">D) La mafia non esiste più</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Domanda 14 -->
+                <div class="question">
+                    <span class="question-number">Domanda 6</span>
+                    <div class="question-text">La mafia continua ad operare in Italia nel 2025?</div>
+                    <div class="options">
+                        <div class="option">
+                            <input type="radio" name="q14" id="q14a" value="A">
+                            <label for="q14a">A) No, è completamente sconfitta</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" name="q14" id="q14b" value="B">
+                            <label for="q14b">B) Sì, ma con attività molto ridotte</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" name="q14" id="q14c" value="C">
+                            <label for="q14c">C) Sì, è ancora una minaccia significativa</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" name="q14" id="q14d" value="D">
+                            <label for="q14d">D) Non è possibile saperlo</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Domanda 15 -->
+                <div class="question">
+                    <span class="question-number">Domanda 7</span>
+                    <div class="question-text">Quali erano i principali metodi di lotta contro la mafia utilizzati da Falcone e Borsellino?</div>
+                    <div class="options">
+                        <div class="option">
+                            <input type="radio" name="q15" id="q15a" value="A">
+                            <label for="q15a">A) Violenza e repressione brutale</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" name="q15" id="q15b" value="B">
+                            <label for="q15b">B) Indagini giudiziarie, processi e raccolta di prove</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" name="q15" id="q15c" value="C">
+                            <label for="q15c">C) Negoziati diretti con i boss</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" name="q15" id="q15d" value="D">
+                            <label for="q15d">D) Operazioni militari segrete</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Vero/Falso 1 -->
+                <div class="true-false question">
+                    <span class="question-number">Domanda 8</span>
+                    <div class="question-text">Gli omicidi legati alla mafia sono significativamente diminuiti negli ultimi decenni.</div>
+                    <div class="options">
+                        <div class="option">
+                            <input type="radio" name="q16" id="q16a" value="Vero">
+                            <label for="q16a">Vero</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" name="q16" id="q16b" value="Falso">
+                            <label for="q16b">Falso</label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Vero/Falso 2 -->
+                <div class="true-false question">
+                    <span class="question-number">Domanda 9</span>
+                    <div class="question-text">La mafia ha avuto vittime solo tra i criminali, mai innocenti.</div>
+                    <div class="options">
+                        <div class="option">
+                            <input type="radio" name="q17" id="q17a" value="Vero">
+                            <label for="q17a">Vero</label>
+                        </div>
+                        <div class="option">
+                            <input type="radio" name="q17" id="q17b" value="Falso">
+                            <label for="q17b">Falso</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="actions">
+                    <button type="button" class="btn" id="submitBtn">Verifica Risposte</button>
+                    <button type="button" class="btn" id="resetBtn">Ricomincia</button>
+                </div>
+            </div>
+        </form>
+
+        <div class="result-container" id="resultContainer">
+            <h2 class="result-title">Risultato del Quiz</h2>
+            <div class="score" id="score"></div>
+            <div class="feedback" id="feedback"></div>
+            <div id="correctAnswers"></div>
+            <div class="actions" style="margin-top: 30px;">
+                <button type="button" class="btn" onclick="document.getElementById('resultContainer').style.display='none'; document.getElementById('mafiaQuiz').style.display='block';">Torna al Quiz</button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const answers = {
+            q9: 'B',
+            q10: 'C',
+            q11: 'C',
+            q12: 'D',
+            q13: 'C',
+            q14: 'C',
+            q15: 'B',
+            q16: 'Vero',
+            q17: 'Falso'
+        };
+
+        document.getElementById('submitBtn').addEventListener('click', () => {
+            let score = 0;
+            const total = Object.keys(answers).length;
+            const explanations = [];
+
+            // Valutazione domande a scelta multipla
+            for (let key in answers) {
+                const selected = document.querySelector(`input[name="${key}"]:checked`);
+                const correct = answers[key];
+                const isCorrect = selected && selected.value === correct;
+                if (isCorrect) score++;
+
+                // Spiegazione
+                let explanation = "";
+                switch(key) {
+                    case 'q9':
+                        explanation = "Il Maxiprocesso di Palermo (1986-1987) fu il più grande processo contro la mafia nella storia italiana, con circa 346 condannati.";
+                        break;
+                    case 'q10':
+                        explanation = "Giovanni Falcone fu ucciso il 23 maggio 1992 e Paolo Borsellino il 19 luglio 1992.";
+                        break;
+                    case 'q11':
+                        explanation = "Salvatore Riina era un potente boss di Cosa Nostra, capo della mafia siciliana.";
+                        break;
+                    case 'q12':
+                        explanation = "Tutte le precedenti: Cosa Nostra (Sicilia), Camorra (Campania), 'Ndrangheta (Calabria), Sacra Corona Unita (Puglia).";
+                        break;
+                    case 'q13':
+                        explanation = "In Italia operano più di quattro organizzazioni mafiose distinte, con radicamento regionale diverso.";
+                        break;
+                    case 'q14':
+                        explanation = "La mafia è ancora una minaccia significativa in Italia, anche se ridimensionata rispetto al passato.";
+                        break;
+                    case 'q15':
+                        explanation = "Falcone e Borsellino utilizzarono indagini giudiziarie, processi e raccolta di prove per combattere la mafia.";
+                        break;
+                    case 'q16':
+                        explanation = "È vero: gli omicidi legati alla mafia sono significativamente calati negli ultimi decenni.";
+                        break;
+                    case 'q17':
+                        explanation = "È falso: la mafia ha avuto molte vittime innocenti, non solo criminali.";
+                        break;
+                }
+
+                explanations.push({
+                    key,
+                    correct,
+                    selected: selected ? selected.value : null,
+                    explanation,
+                    isCorrect
+                });
+            }
+
+            // Mostra risultato
+            document.getElementById('score').textContent = `Hai totalizzato ${score} risposte corrette su ${total}.`;
+            document.getElementById('feedback').textContent = score === total
+                ? "Eccellente! Conosci bene la storia della lotta alla mafia."
+                : score >= total * 0.7
+                    ? "Ottimo lavoro! Hai una buona conoscenza della materia."
+                    : score >= total * 0.5
+                        ? "Conosci alcuni aspetti importanti, ma puoi approfondire."
+                        : "Ti consigliamo di approfondire la storia della mafia e della lotta antimafia.";
+
+            // Mostra spiegazioni
+            let correctHtml = '<h3 style="margin-top:32px; font-family: var(--font-family-serif); color: var(--color-accent-gold);">Risposte corrette e spiegazioni:</h3>';
+            explanations.forEach(exp => {
+                const questionLabel = exp.key === 'q16' ? "Domanda 8" : exp.key === 'q17' ? "Domanda 9" : `Domanda ${exp.key.substring(1) - 8}`;
+                correctHtml += `
+                    <div style="margin-top:16px; padding:12px; background:rgba(10,14,39,0.3); border-radius:6px;">
+                        <strong>${questionLabel}:</strong> Risposta corretta: <span style="color:var(--color-accent-gold);">${exp.correct}</span>
+                        ${exp.selected !== null && !exp.isCorrect ? `<br><span style="color:#ff6b6b;">La tua risposta: ${exp.selected}</span>` : ''}
+                        <div class="correct-answer">${exp.explanation}</div>
+                    </div>
+                `;
+            });
+            document.getElementById('correctAnswers').innerHTML = correctHtml;
+
+            // Mostra risultati
+            document.getElementById('mafiaQuiz').style.display = 'none';
+            document.getElementById('resultContainer').style.display = 'block';
+        });
+
+        document.getElementById('resetBtn').addEventListener('click', () => {
+            document.querySelectorAll('input[type="radio"]').forEach(radio => radio.checked = false);
+        });
+    </script>
+</body>
+</html>
+
+
